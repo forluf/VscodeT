@@ -1,0 +1,7 @@
+mode: set
+vscodetutorial/main.go:8.33,9.20 1 1
+vscodetutorial/main.go:9.20,11.3 1 1
+vscodetutorial/main.go:13.2,13.22 1 1
+vscodetutorial/main.go:13.22,15.3 1 0
+vscodetutorial/main.go:16.2,16.19 1 1
+vscodetutorial/main.go:19.13,21.2 1 0
