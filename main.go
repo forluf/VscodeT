@@ -9,10 +9,10 @@ import (
 type kletka bool
 
 var totalX = 50
-var totalY = 10
+var totalY = 20
 var lifePercent = 50
 
-func (table room) GetLifeArround(xstart int, ystart int) {
+func (table room) GetLifeArround(xstart int, ystart int) int {
 	totalLife := 0
 	for i := xstart - 1; i <= xstart+1; i++ {
 		if i < 0 {
@@ -37,7 +37,7 @@ func (table room) GetLifeArround(xstart int, ystart int) {
 			}
 		}
 	}
-	fmt.Println(totalLife)
+	return totalLife
 }
 
 func (table *room) makeLife() {
@@ -73,14 +73,42 @@ func (someRoom room) showAll() {
 	for _, el := range someRoom {
 		for _, el2 := range el {
 			if el2 {
-				fmt.Print("*")
+				fmt.Print("0")
 			} else {
-				fmt.Print("-")
+				fmt.Print(" ")
 			}
 		}
 		fmt.Println()
 	}
-	time.Sleep(time.Second * 2)
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	time.Sleep(time.Millisecond * 100)
+}
+
+func (someRoom room) CheckGeneration() *room {
+	var newGen room
+	newGen.Inizialize()
+	for y, el := range someRoom {
+		for x, _ := range el {
+			life := someRoom.GetLifeArround(x, y)
+			newlife := someRoom[y][x]
+			if life == 3 { // есть
+				newlife = true
+				//continue
+			}
+			if life == 2 { // не меняется
+				//continue
+			}
+			if (life < 2) || (life > 3) { //умирает
+				newlife = false
+				//continue
+			}
+			newGen[y][x] = newlife
+			_ = newlife
+		}
+	}
+	return &newGen
 }
 
 func main() {
@@ -92,7 +120,11 @@ func main() {
 	r.Inizialize()
 	r.makeLife()
 	r.showAll()
-	r.GetLifeArround(0, 0)
+	for i := 0; i < 1000; i++ {
+		r = *r.CheckGeneration()
+		r.showAll()
+	}
+	r.showAll()
 
 	//fmt.Printf("r: %v\n", r[10][49])
 
