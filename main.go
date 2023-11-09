@@ -1,110 +1,99 @@
 package main
 
-/// asdfasdf
 import (
 	"fmt"
 	"math/rand"
 	"time"
 )
 
-const (
-	width  = 80
-	height = 15
-)
+type kletka bool
 
-// Universe является двухмерным полем клеток.
-type Universe [][]bool
+var totalX = 50
+var totalY = 10
+var lifePercent = 50
 
-// NewUniverse возвращает пустую вселенную.
-func NewUniverse() Universe {
-	u := make(Universe, height)
-	for i := range u {
-		u[i] = make([]bool, width)
-	}
-	return u
-}
+func (table room) GetLifeArround(xstart int, ystart int) {
+	totalLife := 0
+	for i := xstart - 1; i <= xstart+1; i++ {
+		if i < 0 {
+			continue
+		}
+		if i >= totalX {
+			continue
+		}
 
-// Seed заполняет вселенную случайными живыми клетками.
-func (u Universe) Seed() {
-	for i := 0; i < (width * height / 4); i++ {
-		u.Set(rand.Intn(width), rand.Intn(height), true)
-	}
-}
-
-// Set устанавливает состояние конкретной клетки.
-func (u Universe) Set(x, y int, b bool) {
-	u[y][x] = b
-}
-
-// Alive сообщает, является ли клетка живой.
-// Если координаты за пределами вселенной, возвращаемся к началу.
-func (u Universe) Alive(x, y int) bool {
-	x = (x + width) % width
-	y = (y + height) % height
-	return u[y][x]
-}
-
-// Neighbors подсчитывает прилегающие живые клетки.
-func (u Universe) Neighbors(x, y int) int {
-	n := 0
-	for v := -1; v <= 1; v++ {
-		for h := -1; h <= 1; h++ {
-			if !(v == 0 && h == 0) && u.Alive(x+h, y+v) {
-				n++
+		for y := ystart - 1; y <= ystart+1; y++ {
+			if y < 0 {
+				continue
+			}
+			if y >= totalY {
+				continue
+			}
+			if (xstart == i) && (ystart == y) {
+				continue
+			}
+			if table[y][i] {
+				totalLife++
 			}
 		}
 	}
-	return n
+	fmt.Println(totalLife)
 }
 
-// Next возвращает состояние определенной клетки на следующем шаге.
-func (u Universe) Next(x, y int) bool {
-	n := u.Neighbors(x, y)
-	return n == 3 || n == 2 && u.Alive(x, y)
-}
+func (table *room) makeLife() {
 
-// String возвращает вселенную как строку
-func (u Universe) String() string {
-	var b byte
-	buf := make([]byte, 0, (width+1)*height)
-
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			b = ' '
-			if u[y][x] {
-				b = '*'
+	for ind1, line := range *table {
+		for ind2, el := range line {
+			life := false
+			sm := rand.Intn(2)
+			if sm == 1 {
+				life = true
 			}
-			buf = append(buf, b)
+			_ = el
+			line[ind2] = life
+
 		}
-		buf = append(buf, '\n')
+		fmt.Println()
+		_ = ind1
 	}
 
-	return string(buf)
 }
 
-// Show очищает экран и возвращает вселенную.
-func (u Universe) Show() {
-	fmt.Print("\x0c", u.String())
-}
-
-// Step обновляет состояние следующей вселенной (b) из
-// текущей вселенной (a).
-func Step(a, b Universe) {
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			b.Set(x, y, a.Next(x, y))
-		}
+func (r *room) Inizialize() {
+	var line []bool
+	for i := 0; i < totalY; i++ {
+		line = make([]bool, totalX)
+		*r = append(*r, line)
 	}
+}
+
+type room [][]bool
+
+func (someRoom room) showAll() {
+	for _, el := range someRoom {
+		for _, el2 := range el {
+			if el2 {
+				fmt.Print("*")
+			} else {
+				fmt.Print("-")
+			}
+		}
+		fmt.Println()
+	}
+	time.Sleep(time.Second * 2)
 }
 
 func main() {
-	a, b := NewUniverse(), NewUniverse()
-	a.Seed()
+	// сначало 1е поколение - случайное заполнение
+	// В пустой если рядом есть 3 живые - идет жизнь
+	// если меньше 2х или больше 3х клетка умирает
+	// если ничего не меняется в течении n ходов все прекращается
+	var r room
+	r.Inizialize()
+	r.makeLife()
+	r.showAll()
+	r.GetLifeArround(0, 0)
 
-	for i := 0; i < 300; i++ {
-		Step(a, b)
-		a.Show()
-		time.Sleep(time.Second / 30)
-		a, b = b, a // Swap universes
-	}
+	//fmt.Printf("r: %v\n", r[10][49])
+
 }
