@@ -90,7 +90,7 @@ func (someRoom room) CheckGeneration() *room {
 	var newGen room
 	newGen.Inizialize()
 	for y, el := range someRoom {
-		for x, _ := range el {
+		for x := range el {
 			life := someRoom.GetLifeArround(x, y)
 			newlife := someRoom[y][x]
 			if life == 3 { // есть
@@ -111,7 +111,7 @@ func (someRoom room) CheckGeneration() *room {
 	return &newGen
 }
 
-func main1() {
+func fn() {
 	// сначало 1е поколение - случайное заполнение
 	// В пустой если рядом есть 3 живые - идет жизнь
 	// если меньше 2х или больше 3х клетка умирает
